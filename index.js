@@ -1,24 +1,37 @@
-const express = require('express')
-const PORT = 3000
-
+const express = require('express');
 const app = express();
 
-function logger(req, res, next){
-    console.log(`[${Date.now()}] ${req.method} ${req.url}`);
+// Import tiers data
+const tiers = require('./tiers');
+
+// Middleware function to log request information
+function requestLogger(req, res, next) {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 }
 
-app.use(logger);
+app.use(requestLogger);
 
-app.get('/test', (req,res) => {
-    res.json({ok : true});
-})
+// Define routes
+app.get('/data', (req, res) => {
+    res.json(tiers);
+});
 
-app.get('/greet/:name', (req,res) => {
-    const name = req.params.name;
-    const greeting = `Hello ${name}!`;
+app.get('/data/:id', (req, res) => {
+    const id = req.params.id;
+    const tier = tiers.find(tier => tier.id === id);
 
-    res.json({ greeting: greeting});
-})
+    if (!tier) {
+        return res.status(404).json({ message: 'Tier not found' });
+    }
 
-app.listen(PORT, () => console.log('Server is now listening on port',PORT));
+    res.json(tier);
+});
+
+// ... other routes ...
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
