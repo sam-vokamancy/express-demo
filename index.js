@@ -28,8 +28,6 @@ app.get('/data/:id', (req, res) => {
     res.json(tier);
 });
 
-// ... other routes ...
-
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
